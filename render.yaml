@@ -12,7 +12,7 @@ services:
     rootDir: client
     buildCommand: "npm install && npm run build"
     staticPublishPath: dist
-    plan: free
     envVars:
       - key: VITE_API_TOKEN
         sync: false
+

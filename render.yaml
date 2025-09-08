@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: snap-signaling-server
+    env: node
+    rootDir: server
+    buildCommand: "npm install"
+    startCommand: "node server.js"
+    plan: free
+
+  - type: static
+    name: snap-frontend
+    rootDir: client
+    buildCommand: "npm install && npm run build"
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_TOKEN
+        sync: false

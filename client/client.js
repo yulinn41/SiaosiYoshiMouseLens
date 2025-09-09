@@ -8,6 +8,7 @@ const STAGING_API_TOKEN = "eyJhbGciOiJIUzI1NiIsImtpZCI6IkNhbnZhc1MyU0hNQUNQcm9kI
 // 上線用：Production Token（正式網域）
 const PRODUCTION_API_TOKEN = "eyJhbGciOiJIUzI1NiIsImtpZCI6IkNhbnZhc1MyU0hNQUNQcm9kIiwidHlwIjoiSldUIn0.eyJhdWQiOiJjYW52YXMtY2FudmFzYXBpIiwiaXNzIjoiY2FudmFzLXMyc3Rva2VuIiwibmJmIjoxNzU3MTg1NzgxLCJzdWIiOiI0MWQyNzcwYS1lYTg2LTRjMDctYmU0NS00M2Q5MzNmYzA1ZDl-UFJPRFVDVElPTn4xYTU1Zjc2MS02MjJiLTQyZmEtOTRiYi1iYzAxNDA2OWJjZjMifQ.j5HJ1j_XRke3xMKGb0eKdwbgaKAHDUhl_r2caKjJNSU";
 const apiToken = import.meta.env.VITE_API_TOKEN;
+console.log("Current API Token:", apiToken);
 
 const lensId = "f864247c-6a5d-4c61-bec5-6b07d354200f";
 const lensGroupId = "0190c6c5-c7fd-4d75-9fa9-e18dfecb854b";
@@ -16,7 +17,6 @@ const lensGroupId = "0190c6c5-c7fd-4d75-9fa9-e18dfecb854b";
 const canvas = document.getElementById("localCanvas");
 const remoteVideo = document.getElementById("remoteVideo");
 
-// ====== Camera Kit 初始化 ======
 // ====== Camera Kit 初始化 ======
 (async () => {
   try {

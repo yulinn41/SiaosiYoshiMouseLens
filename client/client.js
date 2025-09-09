@@ -53,7 +53,7 @@ const pc = new RTCPeerConnection();
 
 // 根據 http/https 自動決定 ws/wss
 const protocol = window.location.protocol === "https:" ? "wss" : "ws";
-const ws = new WebSocket(`${protocol}://${window.location.host}`);
+const ws = new WebSocket("wss://snap-signaling-server.onrender.com");
 
 // 本地濾鏡畫面推送
 const canvasStream = canvas.captureStream(30);

@@ -4,12 +4,13 @@
   <meta charset="UTF-8">
   <title>Camera Kit Local Test</title>
   <style>
+    /* ====== 全域設定 ====== */
     body {
       margin: 0;
       height: 100vh;
       display: flex;
       background: #000;
-      color: white;
+      color: rgb(235, 235, 235);
       font-family: Arial, sans-serif;
     }
 
@@ -18,99 +19,207 @@
       flex: 1;
     }
 
-    /* 左側區域：上下兩塊 */
-    .left {
+    /* ====== 左側區塊 ====== */
+    .left-bar {
+      width: 6%;
+      background: #FEEFE5;
+      height: 100%;
+    }
+
+    .left-main {
+      width: 29%;
       display: flex;
       flex-direction: column;
-      width: 40%; /* 左側佔 40% */
     }
 
-    .square {
-      flex: 1;
+    /* 左側圓形容器 */
+    .circle {
+      width: 100%;
       aspect-ratio: 1 / 1;
-      background: #000;
+      border-radius: 50%;
+      background: rgb(0, 145, 110);
       display: flex;
       align-items: center;
       justify-content: center;
-      position: relative;
+      overflow: hidden;
     }
 
-    #localCanvas, #remoteVideo {
+    .circle canvas,
+    .circle video {
       width: 100%;
       height: 100%;
-      object-fit: cover; /* 保持比例，不壓縮，超出裁切 */
+      object-fit: cover;
     }
 
-    /* 左上（本地濾鏡畫面） */
-    .local {
-      background: purple; /* 參考圖示紫色 */
-    }
-
-    /* 左下保留黑色背景 */
+    /* 黑色說明區 */
     .bottom {
       background: #000;
-    }
-
-    /* 右側區域：一整塊 */
-    .right {
       flex: 1;
-      background: white; /* 遠端畫面背景 */
       display: flex;
       align-items: center;
       justify-content: center;
-      position: relative;
+      padding: 15px;
     }
 
-    /* 切換按鈕 */
+    .info-card {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 15px 20px;
+      border-radius: 10px;
+      max-width: 90%;
+      color: #feefe5;
+      text-align: left;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .info-card h3 {
+      margin: 0 0 10px 0;
+      font-size: 18px;
+      color: #00916e;
+    }
+
+    .info-card table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .info-card th {
+      text-align: left;
+      padding: 4px 8px;
+      vertical-align: top;
+      width: 100px;
+      color: rgb(238, 97, 35);
+    }
+
+    .info-card td {
+      padding: 4px 8px;
+    }
+
+    .info-card ul {
+      margin: 4px 0 0 15px;
+      padding: 0;
+    }
+
+    /* ====== 右側區塊 ====== */
+    .right {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: none;
+    }
+
+    .right-circle {
+      aspect-ratio: 1 / 1;
+      width: 100%;
+      border-radius: 50%;
+      background: rgb(255, 207, 0);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .right-circle video,
+    .right-circle canvas {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* 右邊黑色條 */
+    .right-bar {
+      width: 7%;
+      background: #FEEFE5;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 20px;
+    }
+
+    /* ====== 切換按鈕 ====== */
     .swap-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
       padding: 10px 15px;
       border: none;
       border-radius: 8px;
-      background: #444;
-      color: #fff;
+      background: #00916E;
+      color: #feefe5;
       cursor: pointer;
       font-size: 14px;
     }
     .swap-btn:hover {
-      background: #666;
+      background: #035407;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="left">
-      <div class="square local">
+    <!-- 左側黑條 -->
+    <div class="left-bar"></div>
+
+    <!-- 左側主體：圓形 + 說明 -->
+    <div class="left-main">
+      <div class="circle local" id="leftCircle">
         <canvas id="localCanvas"></canvas>
       </div>
-      <div class="square bottom"></div>
+      <div class="bottom">
+        <div class="info-card">
+          <h3>Camera Kit 跨國視訊裝置</h3>
+          <table>
+            <tr>
+              <th>已完成功能</th>
+              <td>單人濾鏡架上網路即時通訊</td>
+            </tr>
+            <tr>
+              <th>尚須調整項目</th>
+              <td>
+                <ul>
+                  <li>待濾鏡官方審核，啟用正式版 (無浮水印)</li>
+                  <li>多人頭套，目前只有一人</li>
+                </ul>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
     </div>
+
+    <!-- 右側圓形（遠端影像） -->
     <div class="right">
-      <video id="remoteVideo" autoplay playsinline></video>
+      <div class="right-circle" id="rightCircle">
+        <video id="remoteVideo" autoplay playsinline></video>
+      </div>
+    </div>
+
+    <!-- 右側黑條：切換按鈕 -->
+    <div class="right-bar">
       <button class="swap-btn" id="swapBtn">切換位置</button>
     </div>
   </div>
 
-  <!-- 你的前端邏輯 -->
+  <!-- 前端邏輯 -->
   <script type="module" src="/client.js"></script>
   <script>
     const swapBtn = document.getElementById("swapBtn");
     const localCanvas = document.getElementById("localCanvas");
     const remoteVideo = document.getElementById("remoteVideo");
-    const leftTop = document.querySelector(".local");
-    const right = document.querySelector(".right");
+    const leftCircle = document.getElementById("leftCircle");
+    const rightCircle = document.getElementById("rightCircle");
 
     let swapped = false;
 
     swapBtn.addEventListener("click", () => {
       if (!swapped) {
-        right.prepend(localCanvas); // 把本地畫面移到右邊
-        leftTop.appendChild(remoteVideo); // 遠端移到左上
+        rightCircle.innerHTML = "";
+        rightCircle.appendChild(localCanvas);
+        leftCircle.innerHTML = "";
+        leftCircle.appendChild(remoteVideo);
       } else {
-        leftTop.appendChild(localCanvas);
-        right.prepend(remoteVideo);
+        leftCircle.innerHTML = "";
+        leftCircle.appendChild(localCanvas);
+        rightCircle.innerHTML = "";
+        rightCircle.appendChild(remoteVideo);
       }
       swapped = !swapped;
     });

@@ -49,7 +49,9 @@ const remoteVideo = document.getElementById("remoteVideo");
 })();
 
 // ====== WebRTC ======
-const pc = new RTCPeerConnection();
+const pc = new RTCPeerConnection({
+  iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
+});
 
 // 根據 http/https 自動決定 ws/wss
 const protocol = window.location.protocol === "https:" ? "wss" : "ws";

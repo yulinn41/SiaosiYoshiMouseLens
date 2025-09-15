@@ -58,7 +58,7 @@ const protocol = window.location.protocol === "https:" ? "wss" : "ws";
 const ws = new WebSocket("wss://snap-signaling-server.onrender.com");
 
 // 本地濾鏡畫面推送
-const canvasStream = canvas.captureStream(30);
+const canvasStream = canvas.captureStream(20);
 canvasStream.getTracks().forEach(track => pc.addTrack(track, canvasStream));
 
 // 接收遠端流

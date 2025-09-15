@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
   <meta charset="UTF-8">
   <title>Camera Kit Local Test</title>
@@ -22,7 +23,7 @@
     /* ====== 左側區塊 ====== */
     .left-bar {
       width: 6%;
-      background: #FEEFE5;
+      background: #000000;
       height: 100%;
     }
 
@@ -49,6 +50,7 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+      transform: scaleX(-1);
     }
 
     /* 黑色說明區 */
@@ -125,12 +127,13 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+      transform: scaleX(-1);
     }
 
     /* 右邊黑色條 */
     .right-bar {
       width: 7%;
-      background: #FEEFE5;
+      background: #000000;
       height: 100%;
       display: flex;
       flex-direction: column;
@@ -148,11 +151,13 @@
       cursor: pointer;
       font-size: 14px;
     }
+
     .swap-btn:hover {
       background: #035407;
     }
   </style>
 </head>
+
 <body>
   <div class="container">
     <!-- 左側黑條 -->
@@ -163,7 +168,7 @@
       <div class="circle local" id="leftCircle">
         <canvas id="localCanvas"></canvas>
       </div>
-      <div class="bottom">
+      <!-- <div class="bottom">
         <div class="info-card">
           <h3>Camera Kit 跨國視訊裝置</h3>
           <table>
@@ -187,7 +192,7 @@
             </tr>
           </table>
         </div>
-      </div>
+      </div> -->
     </div>
 
     <!-- 右側圓形（遠端影像） -->
@@ -230,4 +235,5 @@
     });
   </script>
 </body>
+
 </html>

@@ -66,7 +66,18 @@ pc.ontrack = e => {
   console.log("✅ Remote stream received");
   remoteVideo.srcObject = e.streams[0];
 };
-
+// **新增：處理連線狀態變更**
+pc.onconnectionstatechange = () => {
+    console.log("WebRTC 連線狀態:", pc.connectionState);
+    if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed') {
+        console.log("❌ WebRTC 連線中斷");
+        // 當連線中斷時，移除遠端影像
+        remoteVideo.srcObject = null;
+        // 或者您也可以選擇隱藏它，例如：
+        // remoteVideo.style.display = 'none';
+        // 這樣可以避免畫面卡住
+    }
+};
 // ICE candidate
 pc.onicecandidate = e => {
   if (e.candidate && ws.readyState === WebSocket.OPEN) {

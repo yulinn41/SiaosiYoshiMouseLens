@@ -166,7 +166,8 @@
     <!-- 左側主體：圓形 + 說明 -->
     <div class="left-main">
       <div class="circle local" id="leftCircle">
-        <canvas id="localCanvas"></canvas>
+        <video id="remoteVideo" autoplay playsinline></video>
+
       </div>
       <!-- <div class="bottom">
         <div class="info-card">
@@ -198,7 +199,8 @@
     <!-- 右側圓形（遠端影像） -->
     <div class="right">
       <div class="right-circle" id="rightCircle">
-        <video id="remoteVideo" autoplay playsinline></video>
+        <canvas id="localCanvas"></canvas>
+
       </div>
     </div>
 

@@ -45,10 +45,10 @@ async function setupCameraKit() {
 
     await cameraKitSession.play();
     console.log("▶️ Session playing...");
-    
+
     // 啟動 WebRTC
     setupWebRTC();
-    
+
   } catch (err) {
     console.error("❌ CameraKit init failed:", err);
   }
@@ -105,12 +105,19 @@ function setupWebRTC() {
   // WebSocket 訊息
   ws.onopen = () => {
     console.log("✅ WebSocket connected");
-    startCall();
+    // 不再在這裡直接呼叫 startCall()，讓伺服器決定由誰發起
   };
 
   ws.onmessage = async e => {
     const msg = JSON.parse(e.data);
 
+    // 如果收到伺服器的連線請求，則發起 offer
+    if (msg.type === "start_call_request") {
+        console.log("📩 收到伺服器連線請求，發起 Offer...");
+        startCall();
+        return; // 處理完畢，不繼續往下
+    }
+    
     if (msg.offer) {
       console.log("📩 Got offer");
       await pc.setRemoteDescription(new RTCSessionDescription(msg.offer));

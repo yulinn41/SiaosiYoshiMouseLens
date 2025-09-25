@@ -1,3 +1,4 @@
+// server.js (修正後)
 const express = require("express");
 const http = require("http");
 const WebSocket = require("ws");
@@ -20,27 +21,27 @@ wss.on("connection", ws => {
 
   console.log("新客戶端連線，目前連線數:", wss.clients.size);
 
-
- 
+  // 【✅ 修正點 1：移除舊的連線啟動邏輯。不再依賴 wss.clients.size 來發送 start_call_request】
+  
   ws.on("message", msg => {
     const data = JSON.parse(msg.toString());
     
-    // 【⭐ 核心修正：當收到 'request_call' 時，廣播給所有其他人】
+    // 【✅ 修正點 2：當收到 'request_call' 時，直接協調誰發起 Offer】
     if (data.type === "request_call") {
       console.log("📩 收到客戶端重新連線請求 ('request_call')");
       
-      // 不只是傳給另一個人發 Offer，而是告訴所有其他人：「請重新連線！」
+      // 找到另一個連線的客戶端
       wss.clients.forEach(client => {
         if (client !== ws && client.readyState === WebSocket.OPEN) {
-          // 向所有其他客戶端廣播一個新的信號，讓它們重啟 setupWebRTC
-          client.send(JSON.stringify({ type: "peer_reconnect_request" }));
-          console.log("📤 已向另一方發送 'peer_reconnect_request'");
+          // 向另一方發送 start_call_request，告訴它發起 Offer
+          client.send(JSON.stringify({ type: "start_call_request" }));
+          console.log("📤 已向另一方發送 'start_call_request' (發起 Offer 指令)");
         }
       });
       return; // 處理完畢
     }
 
-    // 廣播訊息給所有其他客戶端 (原本處理 Offer/Answer/Candidate 的邏輯)
+    // 廣播訊息給所有其他客戶端 (Offer/Answer/Candidate 的邏輯)
     wss.clients.forEach(client => {
       if (client !== ws && client.readyState === WebSocket.OPEN) {
         client.send(msg.toString());

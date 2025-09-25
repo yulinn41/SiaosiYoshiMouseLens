@@ -60,6 +60,23 @@ function setupWebRTC() {
   if (pc) {
     pc.close();
     console.log("舊的 RTCPeerConnection 已關閉");
+     // 處理連線狀態變更
+  pc.onconnectionstatechange = () => {
+    console.log("WebRTC 連線狀態:", pc.connectionState);
+    if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed') {
+      console.log("❌ WebRTC 連線中斷");
+      remoteVideo.srcObject = null;
+    }
+    
+    if (pc.connectionState === 'connected' && checkInterval) {
+         clearInterval(checkInterval); 
+    }
+  };
+
+  // ... (保留 ws.onopen, ws.onmessage, startCall 等其他代碼) ...
+
+  // 【⭐ 新增呼叫：啟動定時檢查】
+  startConnectionCheck();
   }
   if (ws) {
     ws.close();
@@ -167,3 +184,27 @@ reconnectBtn.addEventListener("click", () => {
   console.log("--- 重新啟動 WebRTC 連線 ---");
   setupWebRTC();
 });
+
+function startConnectionCheck() {
+  // 清除舊的定時器，避免重複執行
+  if (checkInterval) {
+    clearInterval(checkInterval);
+  }
+
+  // 每 15 秒檢查一次連線狀態
+  checkInterval = setInterval(() => {
+    // 只有在 pc 存在且連線狀態不是 'connected' 或 'connecting' 時才嘗試重連
+    if (pc && pc.connectionState !== 'connected' && pc.connectionState !== 'connecting') {
+      console.log(`❌ WebRTC 閒置/中斷 (${pc.connectionState})，自動觸發重新連線...`);
+      // 呼叫 setupWebRTC() 會關閉舊連線，建立新連線，並發送 'request_call'
+      setupWebRTC();
+    } else if (pc) {
+      // 保持靜默，如果連線正常，不做任何事
+      console.log(`✅ WebRTC 狀態良好: ${pc.connectionState}`);
+    } else {
+        // 如果 pc 尚未初始化 (例如剛打開網頁時)，可以選擇在此呼叫 setupWebRTC()
+        // 但由於 setupCameraKit 已經會在頁面載入時呼叫 setupWebRTC，通常不需要。
+    }
+  }, 15000); // 15000 毫秒 = 15 秒
+  console.log("⚙️ 開始自動連線狀態檢查 (每 15 秒)");
+}

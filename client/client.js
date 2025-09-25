@@ -110,16 +110,24 @@ function setupWebRTC() {
     console.log("📤 Sent 'request_call' to server.");
 
   };
-
-  ws.onmessage = async e => {
+ws.onmessage = async e => {
     const msg = JSON.parse(e.data);
+
+    // 【⭐ 新增邏輯：收到同伴的重連請求】
+    if (msg.type === "peer_reconnect_request") {
+        console.log("📩 收到同伴重連請求，立即重啟 WebRTC 連線...");
+        // 收到這個信號時，客戶端會關閉舊連線，並發送自己的 'request_call' 信號。
+        setupWebRTC(); 
+        return;
+    }
 
     // 如果收到伺服器的連線請求，則發起 offer
     if (msg.type === "start_call_request") {
         console.log("📩 收到伺服器連線請求，發起 Offer...");
         startCall();
-        return; // 處理完畢，不繼續往下
+        return;
     }
+    
     
     if (msg.offer) {
       console.log("📩 Got offer");

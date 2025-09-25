@@ -102,10 +102,13 @@ function setupWebRTC() {
     }
   };
 
-  // WebSocket 訊息
+// WebSocket 訊息
   ws.onopen = () => {
     console.log("✅ WebSocket connected");
-    // 不再在這裡直接呼叫 startCall()，讓伺服器決定由誰發起
+
+    ws.send(JSON.stringify({ type: "request_call" }));
+    console.log("📤 Sent 'request_call' to server.");
+
   };
 
   ws.onmessage = async e => {

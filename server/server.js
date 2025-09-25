@@ -20,11 +20,6 @@ wss.on("connection", ws => {
 
   console.log("新客戶端連線，目前連線數:", wss.clients.size);
 
-  // 如果目前連線數恰好是兩位，代表有其他人在線，通知新連線者發起連線
-  if (wss.clients.size === 2) {
-    ws.send(JSON.stringify({ type: "start_call_request" }));
-    console.log("已發送 'start_call_request' 給新連線者");
-  }
 
  
   ws.on("message", msg => {

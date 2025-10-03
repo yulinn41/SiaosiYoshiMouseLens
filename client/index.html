@@ -5,7 +5,6 @@
   <meta charset="UTF-8">
   <title>Camera Kit Local Test</title>
   <style>
-    /* ====== 全域設定 ====== */
     body {
       margin: 0;
       height: 100vh;
@@ -20,7 +19,6 @@
       flex: 1;
     }
 
-    /* ====== 左側區塊 ====== */
     .left-bar {
       width: 6%;
       background: #000000;
@@ -33,7 +31,6 @@
       flex-direction: column;
     }
 
-    /* 左側圓形容器 */
     .circle {
       width: 100%;
       aspect-ratio: 1 / 1;
@@ -51,9 +48,9 @@
       height: 100%;
       object-fit: cover;
       transform: scaleX(-1);
+      transition: transform 0.3s ease;
     }
 
-    /* 黑色說明區 */
     .bottom {
       background: #000;
       flex: 1;
@@ -102,7 +99,6 @@
       padding: 0;
     }
 
-    /* ====== 右側區塊 ====== */
     .right {
       flex: 1;
       display: flex;
@@ -128,9 +124,9 @@
       height: 100%;
       object-fit: cover;
       transform: scaleX(-1);
+      transition: transform 0.3s ease;
     }
 
-    /* 右邊黑色條 */
     .right-bar {
       width: 7%;
       background: #000000;
@@ -139,17 +135,22 @@
       flex-direction: column;
       align-items: center;
       padding-top: 20px;
+      gap: 15px;
     }
 
-    /* ====== 切換按鈕 ====== */
-    .swap-btn {
+    .swap-btn,
+    .reconnect-btn,
+    .rotate-btn {
       padding: 10px 15px;
       border: none;
       border-radius: 8px;
-      background: #00916E;
       color: #feefe5;
       cursor: pointer;
       font-size: 14px;
+    }
+
+    .swap-btn {
+      background: #00916E;
     }
 
     .swap-btn:hover {
@@ -157,85 +158,57 @@
     }
 
     .reconnect-btn {
-      padding: 10px 15px;
-      border: none;
-      border-radius: 8px;
       background: #E84D34;
-      /* 醒目的顏色 */
-      color: #feefe5;
-      cursor: pointer;
-      font-size: 14px;
     }
 
     .reconnect-btn:hover {
       background: #A03423;
+    }
+
+    .rotate-btn {
+      background: #347ae8;
+    }
+
+    .rotate-btn:hover {
+      background: #2556a8;
     }
   </style>
 </head>
 
 <body>
   <div class="container">
-    <!-- 左側黑條 -->
     <div class="left-bar"></div>
 
-    <!-- 左側主體：圓形 + 說明 -->
     <div class="left-main">
       <div class="circle local" id="leftCircle">
         <video id="remoteVideo" autoplay playsinline></video>
-
       </div>
-      <!-- <div class="bottom">
-        <div class="info-card">
-          <h3>Camera Kit 跨國視訊裝置</h3>
-          <table>
-            <tr>
-              <th>已完成功能</th>
-               <td>
-                <ul>
-                  <li>單人濾鏡架上網路即時通訊</li>
-                  <li>最多七人濾鏡</li>
-                </ul>
-              </td>
-            </tr>
-            <tr>
-              <th>尚須調整項目</th>
-              <td>
-                <ul>
-                  <li>待濾鏡官方審核，啟用正式版 (無浮水印)</li>
-                  <li>待unity 整合 25.9.10更新</li>
-                </ul>
-              </td>
-            </tr>
-          </table>
-        </div>
-      </div> -->
     </div>
 
-    <!-- 右側圓形（遠端影像） -->
     <div class="right">
       <div class="right-circle" id="rightCircle">
         <canvas id="localCanvas"></canvas>
-
       </div>
     </div>
 
-    <!-- 右側黑條：切換按鈕 -->
     <div class="right-bar">
       <button class="swap-btn" id="swapBtn">切換位置</button>
-      <button class="reconnect-btn" id="reconnectBtn" style="margin-top: 15px;">重新連線</button>
+      <button class="rotate-btn" id="rotateBtn">旋轉畫面</button>
+      <button class="reconnect-btn" id="reconnectBtn">重新連線</button>
     </div>
   </div>
 
-  <!-- 前端邏輯 -->
   <script type="module" src="/client.js"></script>
   <script>
     const swapBtn = document.getElementById("swapBtn");
+    const rotateBtn = document.getElementById("rotateBtn");
     const localCanvas = document.getElementById("localCanvas");
     const remoteVideo = document.getElementById("remoteVideo");
     const leftCircle = document.getElementById("leftCircle");
     const rightCircle = document.getElementById("rightCircle");
 
     let swapped = false;
+    let rotation = 0; // 當前旋轉角度
 
     swapBtn.addEventListener("click", () => {
       if (!swapped) {
@@ -251,7 +224,14 @@
       }
       swapped = !swapped;
     });
+
+    // ✅ 旋轉畫面按鈕
+    rotateBtn.addEventListener("click", () => {
+      rotation = (rotation + 180) % 360;
+      localCanvas.style.transform = `scaleX(-1) rotate(${rotation}deg)`;
+    });
   </script>
 </body>
 
 </html>
+``

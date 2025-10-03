@@ -208,7 +208,10 @@
     const rightCircle = document.getElementById("rightCircle");
 
     let swapped = false;
-    let rotation = 0; // 當前旋轉角度
+    let rotation = 180; // ✅ 一開始就是 180 度
+
+    // ✅ 一開始就把 localCanvas 設成反的（水平 + 180 度）
+    localCanvas.style.transform = `scaleX(-1) rotate(${rotation}deg)`;
 
     swapBtn.addEventListener("click", () => {
       if (!swapped) {
@@ -225,12 +228,12 @@
       swapped = !swapped;
     });
 
-    // ✅ 旋轉畫面按鈕
     rotateBtn.addEventListener("click", () => {
       rotation = (rotation + 180) % 360;
       localCanvas.style.transform = `scaleX(-1) rotate(${rotation}deg)`;
     });
   </script>
+
 </body>
 
 </html>

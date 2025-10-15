@@ -122,22 +122,14 @@ function setupWebRTC() {
   ws.onmessage = async e => {
     const msg = JSON.parse(e.data);
 
-      // 🔧 這段是新加的
-  if (data.type === "showDonut") {
-    const donut = document.getElementById("donutImage");
-    if (donut) {
-      if (data.value) {
-        donut.style.display = "block";
-        console.log("🍩 台灣電腦 → 顯示甜甜圈");
-      } else {
-        donut.style.display = "none";
-        console.log("🇯🇵 非台灣電腦 → 不顯示甜甜圈");
-      }
-    }
-    return; // 不再繼續處理其他訊息
+if (msg.type === "showDonut") {
+  const donut = document.getElementById("donutImage");
+  if (donut) {
+    donut.style.display = msg.value ? "block" : "none";
+    console.log(msg.value ? "🍩 顯示甜甜圈 (台灣)" : "🇯🇵 不顯示甜甜圈");
   }
-
-  
+  return;
+}
 
     // 如果收到伺服器的連線請求 (start_call_request)，則發起 offer
     if (msg.type === "start_call_request") {

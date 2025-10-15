@@ -15,30 +15,7 @@ const wss = new WebSocket.Server({ server });
 // 提供 public 目錄（index.html + client.js）
 app.use(express.static(path.join(__dirname, "public")));
 
-wss.on("connection", ws => {
-
-   // 🔧 新增：IP 位置與國家偵測
-  const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
-  console.log("🌏 新客戶端連線 IP:", ip);
-
-
-  // 🔧 改用 Promise 寫法（不阻塞 WebSocket 流程）
-  fetch(`https://ipapi.co/${ip}/json/`)
-    .then(res => res.json())
-    .then(info => {
-      const country = info.country_name || "Unknown";
-      console.log(`📍 來源國家：${country}`);
-
-      const isTaiwan = country === "Taiwan";
-      ws.send(JSON.stringify({ type: "showDonut", value: isTaiwan }));
-    })
-    .catch(err => {
-      console.error("❌ IP 查詢失敗:", err);
-      // 若查詢失敗可選擇預設顯示甜甜圈（本地測試方便）
-      ws.send(JSON.stringify({ type: "showDonut", value: true }));
-    });
-
-
+wss.on("connection", (ws, req) => {
 
 
 
@@ -51,6 +28,24 @@ wss.on("connection", ws => {
   }
 
   console.log("新客戶端連線，目前連線數:", wss.clients.size);
+// ✅ 取得 IP
+  const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+  console.log("🔎 客戶端 IP:", ip);
+
+  // ✅ 非阻塞 IP 地理位置查詢
+  fetch(`https://ipapi.co/${ip}/json/`)
+    .then(res => res.json())
+    .then(info => {
+      const country = info.country_name || "Unknown";
+      console.log(`📍 來源國家：${country}`);
+      const isTaiwan = country === "Taiwan";
+      ws.send(JSON.stringify({ type: "showDonut", value: isTaiwan }));
+    })
+    .catch(err => {
+      console.error("❌ IP 查詢失敗:", err);
+      // 為了避免測試環境沒外網時阻斷流程
+      ws.send(JSON.stringify({ type: "showDonut", value: true }));
+    });
 
   // 【✅ 修正點 1：移除舊的連線啟動邏輯。不再依賴 wss.clients.size 來發送 start_call_request】
   

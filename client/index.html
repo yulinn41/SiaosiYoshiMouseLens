@@ -174,10 +174,6 @@
       background: #A03423;
     }
 
-    .rotate-btn {
-      background: #347ae8;
-    }
-
     .rotate-btn:hover {
       background: #2556a8;
     }
@@ -203,7 +199,7 @@
 
     <div class="right-bar">
       <button class="swap-btn" id="swapBtn">切換位置</button>
-      <button class="rotate-btn" id="rotateBtn">旋轉畫面</button>
+
       <button class="reconnect-btn" id="reconnectBtn">重新連線</button>
     </div>
   </div>
@@ -211,17 +207,13 @@
   <script type="module" src="/client.js"></script>
   <script>
     const swapBtn = document.getElementById("swapBtn");
-    const rotateBtn = document.getElementById("rotateBtn");
+
     const localCanvas = document.getElementById("localCanvas");
     const remoteVideo = document.getElementById("remoteVideo");
     const leftCircle = document.getElementById("leftCircle");
     const rightCircle = document.getElementById("rightCircle");
 
     let swapped = false;
-    let rotation = 180; // ✅ 一開始就是 180 度
-
-    // ✅ 一開始就把 localCanvas 設成反的（水平 + 180 度）
-    localCanvas.style.transform = `scaleX(-1) rotate(${rotation}deg)`;
 
     swapBtn.addEventListener("click", () => {
       if (!swapped) {
@@ -238,10 +230,6 @@
       swapped = !swapped;
     });
 
-    rotateBtn.addEventListener("click", () => {
-      rotation = (rotation + 180) % 360;
-      localCanvas.style.transform = `scaleX(-1) rotate(${rotation}deg)`;
-    });
   </script>
 
 </body>

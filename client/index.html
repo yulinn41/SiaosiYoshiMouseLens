@@ -35,7 +35,7 @@
       width: 100%;
       aspect-ratio: 1 / 1;
       border-radius: 50%;
-      background: rgb(0, 145, 110);
+      background: rgb(119, 209, 247);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -111,13 +111,22 @@
       aspect-ratio: 1 / 1;
       width: 100%;
       border-radius: 50%;
-      background: rgb(255, 207, 0);
+      background: rgb(242, 109, 27);
       overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
-    }
+      position: relative;  /* ✅ 讓 donut 可以絕對定位在裡面 */
+  
 
+    }
+#donutImage {
+  position: absolute;
+  width: 100%;         /* 調整甜甜圈大小比例 */
+  height: auto;
+  pointer-events: none;  /* 不影響點擊事件 */
+  z-index: 5;           /* 在最上層顯示 */
+}
     .right-circle video,
     .right-circle canvas {
       width: 100%;
@@ -188,6 +197,7 @@
     <div class="right">
       <div class="right-circle" id="rightCircle">
         <canvas id="localCanvas"></canvas>
+          <img id="donutImage" src="Lens.png" alt="甜甜圈" />
       </div>
     </div>
 

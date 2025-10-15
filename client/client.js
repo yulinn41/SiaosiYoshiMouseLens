@@ -22,6 +22,21 @@ let ws;
 let cameraKitSession;
 let checkInterval; // 【✅ 修正：定時器全域變數】
 
+// ====== 新增：用戶端偵測所在國家 ======
+async function detectCountryAndSend(ws) {
+  try {
+    const res = await fetch("https://ipapi.co/json/");
+    const info = await res.json();
+    const country = info.country_name || "Unknown";
+    console.log(`🌏 本機偵測國家：${country}`);
+
+    ws.send(JSON.stringify({ type: "geo_info", country }));
+  } catch (err) {
+    console.warn("⚠️ 無法偵測國家，預設顯示甜甜圈");
+    ws.send(JSON.stringify({ type: "geo_info", country: "Unknown" }));
+  }
+}
+
 // ====== Camera Kit 初始化 ======
 async function setupCameraKit() {
   try {
@@ -61,7 +76,7 @@ function setupWebRTC() {
   // 【✅ 修正：在開始前清除定時器】
   if (checkInterval) {
     clearInterval(checkInterval);
-    checkInterval = null; 
+    checkInterval = null;
   }
 
   // 檢查並關閉舊的連線
@@ -108,6 +123,7 @@ function setupWebRTC() {
     if (e.candidate && ws.readyState === WebSocket.OPEN) {
       ws.send(JSON.stringify({ candidate: e.candidate }));
       console.log("📡 Sending ICE candidate");
+
     }
   };
 
@@ -117,27 +133,32 @@ function setupWebRTC() {
     // 連線建立時，發送請求給伺服器啟動 Offer/Answer 流程
     ws.send(JSON.stringify({ type: "request_call" }));
     console.log("📤 Sent 'request_call' to server.");
+          // ✅ 新增：啟動前端地理偵測
+      detectCountryAndSend(ws);
   };
 
   ws.onmessage = async e => {
     const msg = JSON.parse(e.data);
 
-if (msg.type === "showDonut") {
-  const donut = document.getElementById("donutImage");
-  if (donut) {
-    donut.style.display = msg.value ? "block" : "none";
-    console.log(msg.value ? "🍩 顯示甜甜圈 (台灣)" : "🇯🇵 不顯示甜甜圈");
-  }
-  return;
-}
+
+    // ✅ 接收伺服器指令決定甜甜圈是否顯示
+    if (msg.type === "showDonut") {
+      const donut = document.getElementById("donutImage");
+      if (donut) {
+        donut.style.display = msg.value ? "block" : "none";
+        console.log(msg.value ? "🍩 顯示甜甜圈 (台灣)" : "🇯🇵 不顯示甜甜圈");
+      }
+      return;
+    }
+
 
     // 如果收到伺服器的連線請求 (start_call_request)，則發起 offer
     if (msg.type === "start_call_request") {
-        console.log("📩 收到伺服器連線請求，發起 Offer...");
-        startCall();
-        return;
+      console.log("📩 收到伺服器連線請求，發起 Offer...");
+      startCall();
+      return;
     }
-    
+
     // 處理 Offer/Answer/Candidate (保持不變)
     if (msg.offer) {
       console.log("📩 Got offer");
@@ -158,7 +179,7 @@ if (msg.type === "showDonut") {
       await pc.addIceCandidate(new RTCIceCandidate(msg.candidate));
     }
   };
-  
+
   // 【✅ 修正：在 setupWebRTC 結束時啟動檢查】
   startConnectionCheck();
 }
@@ -188,7 +209,7 @@ function startConnectionCheck() {
     } else if (pc) {
       // 保持靜默，如果連線正常，不做任何事
       console.log(`✅ WebRTC 狀態良好: ${pc.connectionState}`);
-    } 
+    }
   }, 15000); // 15000 毫秒 = 15 秒
   console.log("⚙️ 開始自動連線狀態檢查 (每 15 秒)");
 }

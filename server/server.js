@@ -28,34 +28,24 @@ wss.on("connection", (ws, req) => {
   }
 
   console.log("新客戶端連線，目前連線數:", wss.clients.size);
-// ✅ 取得 IP
-  const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
-  console.log("🔎 客戶端 IP:", ip);
-
-  // ✅ 非阻塞 IP 地理位置查詢
-  fetch(`https://ipapi.co/${ip}/json/`)
-    .then(res => res.json())
-    .then(info => {
-      const country = info.country_name || "Unknown";
-      console.log(`📍 來源國家：${country}`);
-      const isTaiwan = country === "Taiwan";
-      ws.send(JSON.stringify({ type: "showDonut", value: isTaiwan }));
-    })
-    .catch(err => {
-      console.error("❌ IP 查詢失敗:", err);
-      // 為了避免測試環境沒外網時阻斷流程
-      ws.send(JSON.stringify({ type: "showDonut", value: true }));
-    });
 
   // 【✅ 修正點 1：移除舊的連線啟動邏輯。不再依賴 wss.clients.size 來發送 start_call_request】
-  
+
   ws.on("message", msg => {
     const data = JSON.parse(msg.toString());
-    
+    // ✅ 新增：接收前端回報的國家資訊
+    if (data.type === "geo_info") {
+      const country = data.country;
+      const isTaiwan = country === "Taiwan";
+      console.log(`📍 前端回報國家: ${country}`);
+      ws.send(JSON.stringify({ type: "showDonut", value: isTaiwan }));
+      return;
+    }
+
     // 【✅ 修正點 2：當收到 'request_call' 時，直接協調誰發起 Offer】
     if (data.type === "request_call") {
       console.log("📩 收到客戶端重新連線請求 ('request_call')");
-      
+
       // 找到另一個連線的客戶端
       wss.clients.forEach(client => {
         if (client !== ws && client.readyState === WebSocket.OPEN) {

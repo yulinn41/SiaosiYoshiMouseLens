@@ -4,6 +4,10 @@ const http = require("http");
 const WebSocket = require("ws");
 const path = require("path");
 
+
+// 🔧 新增：node-fetch（用於查詢地理位置）
+const fetch = (...args) => import("node-fetch").then(({ default: fetch }) => fetch(...args));
+
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
@@ -12,6 +16,33 @@ const wss = new WebSocket.Server({ server });
 app.use(express.static(path.join(__dirname, "public")));
 
 wss.on("connection", ws => {
+
+   // 🔧 新增：IP 位置與國家偵測
+  const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+  console.log("🌏 新客戶端連線 IP:", ip);
+
+
+  // 🔧 改用 Promise 寫法（不阻塞 WebSocket 流程）
+  fetch(`https://ipapi.co/${ip}/json/`)
+    .then(res => res.json())
+    .then(info => {
+      const country = info.country_name || "Unknown";
+      console.log(`📍 來源國家：${country}`);
+
+      const isTaiwan = country === "Taiwan";
+      ws.send(JSON.stringify({ type: "showDonut", value: isTaiwan }));
+    })
+    .catch(err => {
+      console.error("❌ IP 查詢失敗:", err);
+      // 若查詢失敗可選擇預設顯示甜甜圈（本地測試方便）
+      ws.send(JSON.stringify({ type: "showDonut", value: true }));
+    });
+
+
+
+
+
+
   // 新增：檢查目前連線人數，如果超過兩位則拒絕
   if (wss.clients.size > 2) {
     console.log("連線人數已滿，拒絕新連線");
